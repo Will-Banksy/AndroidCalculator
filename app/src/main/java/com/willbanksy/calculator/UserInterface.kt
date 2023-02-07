@@ -1,8 +1,6 @@
 package com.willbanksy.calculator
 
 import android.annotation.SuppressLint
-import android.content.ContentValues.TAG
-import android.util.Log
 import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
@@ -110,7 +108,6 @@ fun MainUserInterface(model: CalculatorViewModel) {
                                 0.dp
                             }
                         }
-                        Log.d(TAG, "MainUserInterface: heightLeft($heightLeft)")
                         if(heightLeft > heightForMiniText) {
                             Box(
                                 contentAlignment = Alignment.BottomCenter
@@ -120,7 +117,6 @@ fun MainUserInterface(model: CalculatorViewModel) {
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .drawWithContent {},
-//                                        .background(Color.Cyan.copy(alpha = 0.2f)),
                                     onTextLayout = {
                                         txtHeightLarge = it.size.height
                                     },
@@ -148,6 +144,16 @@ fun MainUserInterface(model: CalculatorViewModel) {
                             }
                         }
                         Box {
+                            if(heightLeft <= heightForMiniText) {
+                                Text( // What is actually drawn
+                                    text = model.state.prevCalc,
+                                    modifier = Modifier
+                                        .fillMaxWidth(),
+                                    textAlign = TextAlign.End,
+                                    color = MaterialTheme.colors.onBackground.copy(alpha = animDragVal.value),
+                                    fontSize = 64.sp,
+                                )
+                            }
                             Row {
                                 val text = if(model.state.prevCalc.isNotEmpty() && model.state.x == model.state.prevAns && model.state.op == null) "=" else ""
                                 Text(
