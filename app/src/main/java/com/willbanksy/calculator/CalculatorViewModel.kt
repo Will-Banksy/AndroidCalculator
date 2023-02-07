@@ -9,18 +9,19 @@ import kotlin.math.pow
 class CalculatorViewModel: ViewModel() {
     var state by mutableStateOf(CalculatorState())
 
-    fun enterNumber(number: String) {
+    fun enterNumber(number: String): Boolean { // Return false for error, true for no error
         if(state.op == null) {
             if(state.x.length >= 9) {
-                return
+                return false
             }
             state = state.copy(x = state.x + number)
-            return
+            return true
         }
         if(state.y.length >= 9) {
-            return
+            return false
         }
         state = state.copy(y = state.y + number)
+        return true
     }
 
     fun enterOperator(operator: CalcOperator) {
@@ -31,6 +32,10 @@ class CalculatorViewModel: ViewModel() {
 
     fun clear() {
         state = CalculatorState()
+    }
+    
+    fun clearCalc() {
+        state = CalculatorState(prevCalc = state.prevCalc)
     }
 
     fun delete() {
@@ -61,7 +66,7 @@ class CalculatorViewModel: ViewModel() {
         }
     }
 
-    fun calculate() {
+    fun calculate(): Boolean {
         val x = state.x.toFloatOrNull()
         val y = state.y.toFloatOrNull()
         if(x != null && state.op != null && y != null) {
@@ -73,11 +78,14 @@ class CalculatorViewModel: ViewModel() {
                 CalcOperator.POWER -> x.pow(y)
                 null -> x // Unreachable
             }
-            state = CalculatorState(prevCalc = state.x + state.op!!.opString + state.y, x = result.toString())
+            val ans = result.toString()
+            state = CalculatorState(prevCalc = state.x + state.op!!.opString + state.y, prevAns = ans, prevOperator = state.op, x = ans)
+            return true
         }
+        return false
     }
-
-    fun invertSign() {
+    
+    fun invertSign() { // Return false for error, true for no error
         if(state.op == null) {
             val x = state.x.toFloatOrNull()
             if(x != null) {
@@ -91,9 +99,11 @@ class CalculatorViewModel: ViewModel() {
         }
     }
 
-    fun enterDecimalPoint() {
+    fun enterDecimalPoint(): Boolean { // Return false for error, true for no error
         if(state.op == null) {
-            if(state.x.length >= 8) return
+            if(state.x.length >= 8) {
+                return false
+            }
             if(state.x.isNotEmpty()) {
                 val x = state.x.toIntOrNull() // Will fail if there is a .
                 if(x != null) {
@@ -103,7 +113,9 @@ class CalculatorViewModel: ViewModel() {
                 state = state.copy(x = "0.")
             }
         } else {
-            if(state.y.length >= 8) return
+            if(state.y.length >= 8) {
+                return false
+            }
             if(state.y.isNotEmpty()) {
                 val y = state.y.toIntOrNull() // Will fail if there is a .
                 if(y != null) {
@@ -112,6 +124,14 @@ class CalculatorViewModel: ViewModel() {
             } else {
                 state = state.copy(y = "0.")
             }
+        }
+        return true
+    }
+    
+    fun pullDown() {
+        if(state.prevOperator != null) {
+            val split = state.prevCalc.split(state.prevOperator!!.opString)
+            state = CalculatorState(x = split[0], op = state.prevOperator, y = split[1])
         }
     }
 }

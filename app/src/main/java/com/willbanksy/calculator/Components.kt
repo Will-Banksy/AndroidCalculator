@@ -1,6 +1,7 @@
 package com.willbanksy.calculator
 
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -17,19 +18,22 @@ enum class ButtonRole {
     TERTIARY
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CalculatorButton(
     text: String,
     modifier: Modifier = Modifier,
     role: ButtonRole = ButtonRole.PRIMARY,
+    onLongClick: () -> Unit = {},
     onClick: () -> Unit
 ) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable {
-                onClick()
-            }
+            .combinedClickable(
+                onClick = onClick,
+                onLongClick = onLongClick
+            )
             .then(modifier),
         color = when(role) {
             ButtonRole.PRIMARY -> MaterialTheme.colors.primary

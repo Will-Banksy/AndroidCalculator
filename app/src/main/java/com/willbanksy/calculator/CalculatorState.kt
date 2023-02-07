@@ -10,6 +10,8 @@ enum class CalcOperator(val opString: String) {
 
 data class CalculatorState(
     val prevCalc: String = "",
+    val prevAns: String = "",
+    val prevOperator: CalcOperator? = null,
     val x: String = "",
     val y: String = "",
     val op: CalcOperator? = null
